@@ -240,9 +240,9 @@
 <div class="container">
     <button class="music-btn" onclick="toggleAudio()">🎵 Song: Tum Se Hi</button>
     
-    <!-- Audio Source (Romantic Tune/Song) -->
+    <!-- Link to your uploaded song.mp3 -->
     <audio id="bgMusic" loop preload="auto">
-        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=romantic-piano-112199.mp3" type="audio/mpeg">
+        <source src="song.mp3" type="audio/mpeg">
     </audio>
 
     <!-- STEP 1: LOCK SCREEN -->
@@ -329,7 +329,7 @@
         if(val === secretPasscode) {
             goToStep('step2');
             triggerConfetti();
-            playAudio(); // Start music on unlock
+            playAudio();
         } else {
             document.getElementById('errorMsg').style.display = 'block';
         }
@@ -340,7 +340,7 @@
         audio.play().then(() => {
             isAudioPlaying = true;
         }).catch(err => {
-            console.log("Audio play blocked by browser, user can use top right button");
+            console.log("Audio play blocked");
         });
     }
 
