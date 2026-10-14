@@ -238,11 +238,10 @@
 <body>
 
 <div class="container">
-    <button class="music-btn" onclick="toggleAudio()">🎵 Song: Tum Se Hi</button>
+    <button class="music-btn" onclick="toggleAudio()" id="mBtn">🎵 Play Music</button>
     
-<audio id="bgMusic" loop preload="auto">
-    <source src="song.mp3" type="audio/mpeg">
-</audio>
+    <audio id="bgMusic" loop preload="auto">
+        <source src="song.mp3" type="audio/mpeg">
     </audio>
 
     <!-- STEP 1: LOCK SCREEN -->
@@ -329,18 +328,20 @@
         if(val === secretPasscode) {
             goToStep('step2');
             triggerConfetti();
-            playAudio();
+            forcePlayAudio();
         } else {
             document.getElementById('errorMsg').style.display = 'block';
         }
     }
 
-    function playAudio() {
+    function forcePlayAudio() {
         const audio = document.getElementById('bgMusic');
         audio.play().then(() => {
             isAudioPlaying = true;
+            document.getElementById('mBtn').innerText = "⏸️ Pause Music";
         }).catch(err => {
-            console.log("Audio play blocked");
+            console.log("Autoplay blocked by browser policy");
+            document.getElementById('mBtn').innerText = "🎵 Play Music";
         });
     }
 
@@ -349,9 +350,12 @@
         if (isAudioPlaying) {
             audio.pause();
             isAudioPlaying = false;
+            document.getElementById('mBtn').innerText = "🎵 Play Music";
         } else {
-            audio.play();
-            isAudioPlaying = true;
+            audio.play().then(() => {
+                isAudioPlaying = true;
+                document.getElementById('mBtn').innerText = "⏸️ Pause Music";
+            });
         }
     }
 
@@ -396,6 +400,18 @@
             triggerConfetti();
         }
     }
+
+    // Explicit user interaction trigger for browser compliance
+    document.addEventListener('click', function userInteractionHandler() {
+        const audio = document.getElementById('bgMusic');
+        if (!isAudioPlaying) {
+            audio.play().then(() => {
+                isAudioPlaying = true;
+                document.getElementById('mBtn').innerText = "⏸️ Pause Music";
+            }).catch(() => {});
+        }
+        document.removeEventListener('click', userInteractionHandler);
+    });
 </script>
 
 </body>
