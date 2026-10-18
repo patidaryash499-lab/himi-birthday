@@ -242,6 +242,7 @@
     
     <audio id="bgMusic" loop preload="auto">
         <source src="song.mp3" type="audio/mpeg">
+        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mpeg">
     </audio>
 
     <!-- STEP 1: LOCK SCREEN -->
@@ -328,20 +329,25 @@
         if(val === secretPasscode) {
             goToStep('step2');
             triggerConfetti();
-            playAudio();
+            startAudio();
         } else {
             document.getElementById('errorMsg').style.display = 'block';
         }
     }
 
-    function playAudio() {
+    function startAudio() {
         const audio = document.getElementById('bgMusic');
-        audio.play().then(() => {
-            isAudioPlaying = true;
-            document.getElementById('mBtn').innerText = "⏸️ Pause Music";
-        }).catch(err => {
-            console.log("Autoplay blocked until user interaction");
-        });
+        audio.volume = 1.0;
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                isAudioPlaying = true;
+                document.getElementById('mBtn').innerText = "⏸️ Pause Music";
+            }).catch(error => {
+                console.log("Autoplay prevented:", error);
+                document.getElementById('mBtn').innerText = "🎵 Play Music";
+            });
+        }
     }
 
     function toggleAudio() {
@@ -354,7 +360,7 @@
             audio.play().then(() => {
                 isAudioPlaying = true;
                 document.getElementById('mBtn').innerText = "⏸️ Pause Music";
-            });
+            }).catch(e => console.log(e));
         }
     }
 
@@ -400,17 +406,13 @@
         }
     }
 
-    // Touch event listener for mobile browsers
-    document.addEventListener('click', function unlockAudio() {
-        const audio = document.getElementById('bgMusic');
-        if (!isAudioPlaying) {
-            audio.play().then(() => {
-                isAudioPlaying = true;
-                document.getElementById('mBtn').innerText = "⏸️ Pause Music";
-            }).catch(() => {});
+    // Direct User Touch Event to Override Mobile Autoplay Policies
+    window.addEventListener('touchstart', function initialTouch() {
+        if(!isAudioPlaying) {
+            startAudio();
         }
-        document.removeEventListener('click', unlockAudio);
-    });
+        window.removeEventListener('touchstart', initialTouch);
+    }, { once: true });
 </script>
 
 </body>
